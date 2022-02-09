@@ -1,0 +1,12 @@
+#board-div {
+    display: flex;
+    flex-direction: column;
+}
+
+.line {
+    display: flex;
+}
+
+.snake {
+    background-color: #222;
+}
