@@ -15,8 +15,8 @@ function populateBoard(board) {
         line.classList.add('line')
         for (let x = 0; x < 10; x++) {
             const tile = document.createElement('div');
-            tile.style.width = "10px";
-            tile.style.height = "10px";
+            tile.style.width = "1em";
+            tile.style.height = "1em";
             tile.style.border = "1px solid black";
             tile.dataset.x = x;
             tile.dataset.y = y;
@@ -28,32 +28,6 @@ function populateBoard(board) {
 
     return board;
 }
-
-// function moveSnake(dir) {
-//     console.table(snake);
-//     const snakeEnd = snake.length - 1;
-//     board[snake[0][0]][snake[0][1]].classList.remove('snake');
-//     snake.push([...snake[snakeEnd]]);
-//     snake.splice(0, 1);
-
-//     console.table(snake);
-//     switch (dir) {
-//         case 'right':
-//             snake[snakeEnd][0] += 1;
-//             break;
-//         case 'left':
-//             snake[snakeEnd][0] -= 1;
-//             break;
-//         case 'down':
-//             snake[snakeEnd][1] += 1;
-//             break;
-//         case 'up':
-//             snake[snakeEnd][1] -= 1;
-//             break;
-//     }
-    
-//     board[snake[snakeEnd][0]][snake[snakeEnd][1]].classList.add('snake');
-// }
 
 function moveSnake(dir) {
     // Remove the tail, and change background back to white
@@ -79,7 +53,6 @@ function moveSnake(dir) {
     if (isOutOfBounds(snake[0][0], snake[0][1])) return false;
     if (isCollided(snake[0][0], snake[0][1])) return false;
     board[snake[0][0]][snake[0][1]].classList.add('snake')
-    console.log(board[snake[0][0]][snake[0][1]].classList[0]);
 }
 
 function isCollided(x, y) {
@@ -91,8 +64,6 @@ function isCollided(x, y) {
 }
 
 function isOutOfBounds(x, y) {
-    console.log([board.length, board[0].length]);
-    console.log([x, y])
     if ((x < 0 || y < 0) || (x >= board.length || y >= board[0].length)) {
         errorHeader.textContent = "OUT OF BOUNDS";
         return true;
@@ -100,29 +71,73 @@ function isOutOfBounds(x, y) {
     return false;
 }
 
+function changeDir(newDir, currDir) {
+    switch (newDir) {
+        case 'right':
+            if (snake[0][0] >= snake[1][0]) {
+                return 'right';
+            } else {
+                return false;
+            }
+        case 'left':
+            if (snake[0][0] <= snake[1][0]) {
+                return 'left';
+            } else {
+                return false;
+            }
+        case 'up':
+            if (snake[0][1] <= snake[1][1]) {
+                return 'up';
+            } else {
+                return false;
+            }
+        case 'down':
+            if (snake[0][1] >= snake[1][1]) {
+                return 'down';
+            } else {
+                return false;
+            }
+    }
+}
+
 const board = populateBoard(createBoard());
 const snake = [];
-
-// for (let i = 3; i < 6; i++) {
-//     board[i][4].classList.add('snake');
-//     snake.push([i, 4]);
-// }
+let direction = 'right';
 
 for (let i = 8; i > 1; i--) {
     board[i][4].classList.add('snake');
     snake.push([i, 4]);
 }
 
-const down = document.querySelector('#down');
-down.addEventListener('click', () => moveSnake('down'));
+// const down = document.querySelector('#down');
+// down.addEventListener('click', () => {
+//     direction = changeDir('down', direction);
+//     moveSnake(direction);
+// });
 
-const right = document.querySelector('#right');
-right.addEventListener('click', () => moveSnake('right'));
+// const right = document.querySelector('#right');
+// right.addEventListener('click', () => {
+//     direction = changeDir('right', direction);
+//     moveSnake(direction);
+// });
 
-const up = document.querySelector('#up');
-up.addEventListener('click', () => moveSnake('up'));
+// const up = document.querySelector('#up');
+// up.addEventListener('click', () => {
+//     direction = changeDir('up', direction);
+//     moveSnake(direction);
+// });
 
-const left = document.querySelector('#left');
-left.addEventListener('click', () => moveSnake('left'));
-
+// const left = document.querySelector('#left');
+// left.addEventListener('click', () => {
+//     direction = changeDir('left', direction);
+//     moveSnake(direction);
+// });
 const errorHeader = document.querySelector('.error-header');
+
+const directionButtons = document.querySelectorAll('button');
+directionButtons.forEach((b) => {
+    b.addEventListener('click', () => {
+        direction = changeDir(b.id, direction);
+        if (direction) moveSnake(direction);
+    });
+});
