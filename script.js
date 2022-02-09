@@ -1,6 +1,6 @@
 function createBoard() {
     const board = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 30; i++) {
         board[i] = [];
     }
 
@@ -10,10 +10,10 @@ function createBoard() {
 function populateBoard(board) {
     const boardDiv = document.querySelector('#board-div')
 
-    for (let y = 0; y < 10; y++) {
+    for (let y = 0; y < 30; y++) {
         const line = document.createElement('div');
         line.classList.add('line')
-        for (let x = 0; x < 10; x++) {
+        for (let x = 0; x < 30; x++) {
             const tile = document.createElement('div');
             tile.style.width = "1em";
             tile.style.height = "1em";
@@ -30,12 +30,7 @@ function populateBoard(board) {
 }
 
 function moveSnake(dir) {
-    // Remove the tail, and change background back to white
-    // Copy the head to the beginning, and move the head to the end
-    const snakeEnd = snake.length - 1;
-    board[snake[snakeEnd][0]][snake[snakeEnd][1]].classList.remove('snake');
     snake.splice(0, 0, [...snake[0]]);
-    snake.pop();
     switch (dir) {
         case 'right':
             snake[0][0] += 1;
@@ -50,9 +45,28 @@ function moveSnake(dir) {
             snake[0][1] -= 1;
             break;
     }
-    if (isOutOfBounds(snake[0][0], snake[0][1])) return false;
-    if (isCollided(snake[0][0], snake[0][1])) return false;
+    if (isOutOfBounds(snake[0][0], snake[0][1])) {
+        clearInterval(intervalID);
+        return;
+    }
+
+    if (isCollided(snake[0][0], snake[0][1])) {
+        clearInterval(intervalID);
+        return;
+    }
+
     board[snake[0][0]][snake[0][1]].classList.add('snake')
+
+    const snakeEnd = snake.length - 1;
+    if (!snakeGrew) {
+        board[snake[snakeEnd][0]][snake[snakeEnd][1]].classList.remove('snake');
+    } else {
+        snakeGrew = false;
+    }
+
+    snake.pop();
+
+    if (eatApple(snake[0][0], snake[0][1])) growSnake();
 }
 
 function isCollided(x, y) {
@@ -71,73 +85,131 @@ function isOutOfBounds(x, y) {
     return false;
 }
 
+function eatApple(x, y) {
+    if (board[x][y].classList[0] === 'apple') {
+        let newApple = generateApple();
+        moveApple(apple, newApple);
+        apple = newApple;
+        speedUp();
+        return true;
+    }
+
+    return false;
+}
+
+function growSnake() {
+    snake.push([...snake[snake.length - 1]]);
+    snakeGrew = true;
+}
+
 function changeDir(newDir, currDir) {
     switch (newDir) {
         case 'right':
             if (snake[0][0] >= snake[1][0]) {
                 return 'right';
             } else {
-                return false;
+                return currDir;
             }
         case 'left':
             if (snake[0][0] <= snake[1][0]) {
                 return 'left';
             } else {
-                return false;
+                return currDir;
             }
         case 'up':
             if (snake[0][1] <= snake[1][1]) {
                 return 'up';
             } else {
-                return false;
+                return currDir;
             }
         case 'down':
             if (snake[0][1] >= snake[1][1]) {
                 return 'down';
             } else {
-                return false;
+                return currDir;
             }
     }
 }
 
-const board = populateBoard(createBoard());
-const snake = [];
-let direction = 'right';
-
-for (let i = 8; i > 1; i--) {
-    board[i][4].classList.add('snake');
-    snake.push([i, 4]);
+function generateApple() {
+    let x, y;
+    do {
+        x = Math.floor(Math.random() * board.length);
+        y = Math.floor(Math.random() * board.length);
+        console.log(board[x][y].classList);
+    } while (board[x][y].classList.length === 1);
+    return [x, y];
 }
 
-// const down = document.querySelector('#down');
-// down.addEventListener('click', () => {
-//     direction = changeDir('down', direction);
-//     moveSnake(direction);
-// });
+function moveApple(currApple, newApple) {
+    if (currApple) {
+        board[currApple[0]][currApple[1]].classList.remove('apple');
+    }
+    board[newApple[0]][newApple[1]].classList.add('apple');
+}
 
-// const right = document.querySelector('#right');
-// right.addEventListener('click', () => {
-//     direction = changeDir('right', direction);
-//     moveSnake(direction);
-// });
+function speedUp() {
+    clearInterval(intervalID);
+    if (intervalSpeed >= 50) {
+        intervalSpeed -= 3;
+    }
+    intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
+}
 
-// const up = document.querySelector('#up');
-// up.addEventListener('click', () => {
-//     direction = changeDir('up', direction);
-//     moveSnake(direction);
-// });
+/*function moveApple() {
+    if apple[0] === undefined {
 
-// const left = document.querySelector('#left');
-// left.addEventListener('click', () => {
-//     direction = changeDir('left', direction);
-//     moveSnake(direction);
-// });
+    }
+}*/
+
+const board = populateBoard(createBoard());
+const snake = [];
+let snakeGrew = false;
 const errorHeader = document.querySelector('.error-header');
+let direction = 'right';
+let intervalSpeed = 100;
+let intervalID = null;
+
+for (let i = 12; i > 10; i--) {
+    board[i][15].classList.add('snake');
+    snake.push([i, 15]);
+}
+
+let apple = generateApple();
+moveApple(null, apple);
 
 const directionButtons = document.querySelectorAll('button');
 directionButtons.forEach((b) => {
     b.addEventListener('click', () => {
         direction = changeDir(b.id, direction);
-        if (direction) moveSnake(direction);
+        //if (direction) moveSnake(direction);
     });
 });
+
+window.addEventListener('keydown', (e) => {
+    if (intervalID === null) {
+        intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
+    }
+    switch (e.key) {
+        case 'ArrowDown':
+            direction = changeDir('down', direction);
+            break;
+        case 'ArrowRight':
+            direction = changeDir('right', direction);
+            break;
+        case 'ArrowLeft':
+            direction = changeDir('left', direction);
+            break;
+        case 'ArrowUp':
+            direction = changeDir('up', direction);
+            break;
+    }
+});
+
+const startGame = document.querySelector('#start-game');
+startGame.addEventListener('click', () => {
+    if (intervalID === null) {
+        intervalID = setInterval(() => moveSnake('right'), intervalSpeed);
+    }
+});
+

@@ -1,3 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 #board-div {
     display: flex;
     flex-direction: column;
@@ -9,4 +23,8 @@
 
 .snake {
     background-color: #555;
+}
+
+.apple {
+    background-color: red;
 }
