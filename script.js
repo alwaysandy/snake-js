@@ -15,8 +15,8 @@ function populateBoard(board) {
         line.classList.add('line')
         for (let x = 0; x < 30; x++) {
             const tile = document.createElement('div');
-            tile.style.width = "1em";
-            tile.style.height = "1em";
+            tile.style.width = "1.5em";
+            tile.style.height = "1.5em";
             tile.style.border = "1px solid black";
             tile.dataset.x = x;
             tile.dataset.y = y;
