@@ -178,7 +178,7 @@ for (let i = 12; i > 10; i--) {
 let apple = generateApple();
 moveApple(null, apple);
 
-const directionButtons = document.querySelectorAll('button');
+const directionButtons = document.querySelectorAll('.dir-button');
 directionButtons.forEach((b) => {
     b.addEventListener('click', () => {
         direction = changeDir(b.id, direction);
@@ -192,15 +192,19 @@ window.addEventListener('keydown', (e) => {
     }
     switch (e.key) {
         case 'ArrowDown':
+        case 's':
             direction = changeDir('down', direction);
             break;
         case 'ArrowRight':
+        case 'd':
             direction = changeDir('right', direction);
             break;
         case 'ArrowLeft':
+        case 'a':
             direction = changeDir('left', direction);
             break;
         case 'ArrowUp':
+        case 'w':
             direction = changeDir('up', direction);
             break;
     }
@@ -209,7 +213,8 @@ window.addEventListener('keydown', (e) => {
 const startGame = document.querySelector('#start-game');
 startGame.addEventListener('click', () => {
     if (intervalID === null) {
-        intervalID = setInterval(() => moveSnake('right'), intervalSpeed);
+        direction = 'right';
+        intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
     }
 });
 
