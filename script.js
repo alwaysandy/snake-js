@@ -126,11 +126,13 @@ function moveSnake() {
     }
 
     if (isOutOfBounds(snake[0][0], snake[0][1])) {
+        displayError("OUT OF BOUNDS");
         clearInterval(intervalID);
         return;
     }
 
     if (isCollided(snake[0][0], snake[0][1])) {
+        displayError("YOU DUN ATE YOURSELF DUMMY")
         clearInterval(intervalID);
         return;
     }
@@ -145,12 +147,16 @@ function moveSnake() {
         snakeGrew = false;
     }
 
-    eatApple(snake[0][0], snake[0][1])
+    if (board[snake[0][0]][snake[0][1]].classList.contains('apple')) {
+        apple = moveApple(apple);
+        incrementScore();
+        speedUp();
+        snakeGrew = true;
+    }
 }
 
 function isCollided(x, y) {
     if (board[x][y].classList.contains('snake')) {
-        displayError("COLLIDED");
         return true;
     }
     return false;
@@ -158,7 +164,6 @@ function isCollided(x, y) {
 
 function isOutOfBounds(x, y) {
     if ((x < 0 || y < 0) || (x >= board.length || y >= board[0].length)) {
-        displayError("OUT OF BOUNDS");
         return true;
     }
     return false;
@@ -183,20 +188,15 @@ function moveApple(currApple) {
     return newApple;
 }
 
-function eatApple(x, y) {
-    if (board[x][y].classList.contains('apple')) {
-        apple = moveApple(apple);
-        speedUp();
-        score += 1;
-        displayUpdatedScore();
-        snakeGrew = true;
-    }
+function incrementScore() {
+    score += 1;
+    displayUpdatedScore();
 }
 
 function speedUp() {
     clearInterval(intervalID);
-    if (snakeSpeed >= 60) {
-        snakeSpeed -= 3;
+    if (snakeSpeed >= 50) {
+        snakeSpeed -= 1;
     }
     intervalID = setInterval(() => moveSnake(), snakeSpeed);
 }
@@ -245,7 +245,7 @@ const snake = [];
 let snakeGrew = false;
 let direction = 'right';
 let score = 0;
-let snakeSpeed = 100;
+let snakeSpeed = 70;
 let intervalID = null;
 // Add snake and apple to board
 placeSnake();
