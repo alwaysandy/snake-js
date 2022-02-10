@@ -28,9 +28,9 @@ function populateBoard(board) {
     return board;
 }
 
-function moveSnake(dir) {
+function moveSnake() {
     snake.splice(0, 0, [...snake[0]]);
-    switch (dir) {
+    switch (direction) {
         case 'right':
             snake[0][0] += 1;
             break;
@@ -60,23 +60,12 @@ function moveSnake(dir) {
     const snakeEnd = snake.length - 1;
     if (!snakeGrew) {
         board[snake[snakeEnd][0]][snake[snakeEnd][1]].classList.remove('snake');
+        snake.pop();
     } else {
         snakeGrew = false;
     }
 
-    snake.pop();
-
-    if (eatApple(snake[0][0], snake[0][1])) {
-        speedUp();
-        score += 1;
-        updateScore();
-        growSnake();
-    }
-}
-
-function growSnake() {
-    snake.push([...snake[snake.length - 1]]);
-    snakeGrew = true;
+    eatApple(snake[0][0], snake[0][1])
 }
 
 function changeDir(newDir, currDir) {
@@ -124,23 +113,12 @@ function isOutOfBounds(x, y) {
     return false;
 }
 
-function eatApple(x, y) {
-    if (board[x][y].classList.contains('apple')) {
-        let newApple = generateApple();
-        moveApple(apple, newApple);
-        apple = newApple;
-        return true;
-    }
-
-    return false;
-}
-
 function speedUp() {
     clearInterval(intervalID);
     if (snakeSpeed >= 60) {
         snakeSpeed -= 3;
     }
-    intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+    intervalID = setInterval(() => moveSnake(), snakeSpeed);
 }
 
 function generateApple() {
@@ -158,6 +136,18 @@ function moveApple(currApple, newApple) {
         board[currApple[0]][currApple[1]].classList.remove('apple');
     }
     board[newApple[0]][newApple[1]].classList.add('apple');
+}
+
+function eatApple(x, y) {
+    if (board[x][y].classList.contains('apple')) {
+        let newApple = generateApple();
+        moveApple(apple, newApple);
+        apple = newApple;
+        speedUp();
+        score += 1;
+        updateScore();
+        snakeGrew = true;
+    }
 }
 
 function updateScore() {
@@ -189,7 +179,7 @@ function placeSnake() {
 function addControlEventListeners() {
     window.addEventListener('keydown', (e) => {
         if (intervalID === null) {
-            intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+            intervalID = setInterval(() => moveSnake(), snakeSpeed);
         }
         switch (e.key) {
             case 'ArrowDown':
@@ -215,7 +205,7 @@ function addControlEventListeners() {
     startGameButton.addEventListener('click', () => {
         if (intervalID === null) {
             direction = 'right';
-            intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+            intervalID = setInterval(() => moveSnake(), snakeSpeed);
         }
     });
     
