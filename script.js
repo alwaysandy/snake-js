@@ -15,9 +15,8 @@ function populateBoard(board) {
         line.classList.add('line')
         for (let x = 0; x < 30; x++) {
             const tile = document.createElement('div');
-            tile.style.width = "2.5vh";
-            tile.style.height = "2.5vh";
-            tile.style.border = "1px solid #888";
+            tile.classList.add('tile');
+            
             tile.dataset.x = x;
             tile.dataset.y = y;
             line.appendChild(tile);
@@ -66,11 +65,16 @@ function moveSnake(dir) {
 
     snake.pop();
 
-    if (eatApple(snake[0][0], snake[0][1])) growSnake();
+    if (eatApple(snake[0][0], snake[0][1])) {
+        speedUp();
+        score += 1;
+        updateScore();
+        growSnake();
+    }
 }
 
 function isCollided(x, y) {
-    if (board[x][y].classList === 'snake') {
+    if (board[x][y].classList.contains('snake')) {
         errorHeader.textContent = "COLLIDED";
         return true;
     }
@@ -86,11 +90,10 @@ function isOutOfBounds(x, y) {
 }
 
 function eatApple(x, y) {
-    if (board[x][y].classList[0] === 'apple') {
+    if (board[x][y].classList.contains('apple')) {
         let newApple = generateApple();
         moveApple(apple, newApple);
         apple = newApple;
-        speedUp();
         return true;
     }
 
@@ -137,7 +140,7 @@ function generateApple() {
         x = Math.floor(Math.random() * board.length);
         y = Math.floor(Math.random() * board.length);
         console.log(board[x][y].classList);
-    } while (board[x][y].classList.length === 1);
+    } while (board[x][y].classList.contains('snake'));
     return [x, y];
 }
 
@@ -150,10 +153,36 @@ function moveApple(currApple, newApple) {
 
 function speedUp() {
     clearInterval(intervalID);
-    if (intervalSpeed >= 50) {
+    if (intervalSpeed >= 60) {
         intervalSpeed -= 3;
     }
     intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
+}
+
+function updateScore() {
+    scoreHeader.textContent = `Score: ${score}`;
+}
+
+function resetBoard() {
+    clearInterval(intervalID);
+    const tiles = document.querySelectorAll('.tile');
+    tiles.forEach((tile) => {
+        tile.classList.remove('snake');
+    });
+    snake.splice(0, snake.length);
+    placeSnake();
+    intervalID = null;
+    errorHeader.textContent = '';
+    score = 0;
+    updateScore();
+    intervalSpeed = 100;
+}
+
+function placeSnake() {
+    for (let i = 12; i > 10; i--) {
+        board[i][15].classList.add('snake');
+        snake.push([i, 15]);
+    }
 }
 
 /*function moveApple() {
@@ -169,11 +198,10 @@ const errorHeader = document.querySelector('.error-header');
 let direction = 'right';
 let intervalSpeed = 100;
 let intervalID = null;
+let score = 0;
+const scoreHeader = document.querySelector('.score');
 
-for (let i = 12; i > 10; i--) {
-    board[i][15].classList.add('snake');
-    snake.push([i, 15]);
-}
+placeSnake();
 
 let apple = generateApple();
 moveApple(null, apple);
@@ -210,11 +238,15 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-const startGame = document.querySelector('#start-game');
-startGame.addEventListener('click', () => {
+const startGameButton = document.querySelector('#start-game');
+startGameButton.addEventListener('click', () => {
     if (intervalID === null) {
         direction = 'right';
         intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
     }
 });
 
+const resetGameButton = document.querySelector('#reset');
+resetGameButton.addEventListener('click', () => {
+    resetBoard();
+});

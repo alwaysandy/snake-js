@@ -1,15 +1,27 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-family: sans-serif;
+    font-size: 2em;
 }
 
 .game-container {
+    gap: 1em;
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.game-buttons {
+    display: flex;
+    gap: 1em;
 }
 
 #board-div {
@@ -22,10 +34,21 @@
     display: flex;
 }
 
-.snake {
-    background-color: #222;
+.snake.tile {
+    background-color: greenyellow;
+    border: none;
 }
 
 .apple {
     background-color: red;
+}
+
+.tile {
+    width: 2.2vh;
+    height: 2.2vh;
+    border: 1px solid #888;
+}
+
+h2 {
+    font-family: sans-serif;
 }
