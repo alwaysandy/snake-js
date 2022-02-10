@@ -15,7 +15,7 @@
 #board-div {
     display: flex;
     flex-direction: column;
-    border: 1px solid black;
+    border: 1px solid #555;
 }
 
 .line {
@@ -23,7 +23,7 @@
 }
 
 .snake {
-    background-color: #555;
+    background-color: #222;
 }
 
 .apple {
