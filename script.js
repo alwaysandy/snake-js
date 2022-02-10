@@ -16,6 +16,7 @@ function populateBoard(board) {
         for (let x = 0; x < 30; x++) {
             const tile = document.createElement('div');
             tile.classList.add('tile');
+            
             tile.dataset.x = x;
             tile.dataset.y = y;
             line.appendChild(tile);
