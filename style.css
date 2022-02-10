@@ -4,11 +4,6 @@
     box-sizing: border-box;
 }
 
-h1 {
-    font-family: sans-serif;
-    font-size: 2em;
-}
-
 .game-container {
     gap: 1em;
     width: 100vw;
@@ -19,15 +14,21 @@ h1 {
     flex-direction: column;
 }
 
+#board-div {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #555;
+}
+
+
 .game-buttons {
     display: flex;
     gap: 1em;
 }
 
-#board-div {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #555;
+h1 {
+    font-family: sans-serif;
+    font-size: 2em;
 }
 
 .line {

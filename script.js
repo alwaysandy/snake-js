@@ -44,6 +44,7 @@ function moveSnake(dir) {
             snake[0][1] -= 1;
             break;
     }
+
     if (isOutOfBounds(snake[0][0], snake[0][1])) {
         clearInterval(intervalID);
         return;
@@ -71,33 +72,6 @@ function moveSnake(dir) {
         updateScore();
         growSnake();
     }
-}
-
-function isCollided(x, y) {
-    if (board[x][y].classList.contains('snake')) {
-        errorHeader.textContent = "COLLIDED";
-        return true;
-    }
-    return false;
-}
-
-function isOutOfBounds(x, y) {
-    if ((x < 0 || y < 0) || (x >= board.length || y >= board[0].length)) {
-        errorHeader.textContent = "OUT OF BOUNDS";
-        return true;
-    }
-    return false;
-}
-
-function eatApple(x, y) {
-    if (board[x][y].classList.contains('apple')) {
-        let newApple = generateApple();
-        moveApple(apple, newApple);
-        apple = newApple;
-        return true;
-    }
-
-    return false;
 }
 
 function growSnake() {
@@ -134,6 +108,41 @@ function changeDir(newDir, currDir) {
     }
 }
 
+function isCollided(x, y) {
+    if (board[x][y].classList.contains('snake')) {
+        errorHeader.textContent = "COLLIDED";
+        return true;
+    }
+    return false;
+}
+
+function isOutOfBounds(x, y) {
+    if ((x < 0 || y < 0) || (x >= board.length || y >= board[0].length)) {
+        errorHeader.textContent = "OUT OF BOUNDS";
+        return true;
+    }
+    return false;
+}
+
+function eatApple(x, y) {
+    if (board[x][y].classList.contains('apple')) {
+        let newApple = generateApple();
+        moveApple(apple, newApple);
+        apple = newApple;
+        return true;
+    }
+
+    return false;
+}
+
+function speedUp() {
+    clearInterval(intervalID);
+    if (snakeSpeed >= 60) {
+        snakeSpeed -= 3;
+    }
+    intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+}
+
 function generateApple() {
     let x, y;
     do {
@@ -151,14 +160,6 @@ function moveApple(currApple, newApple) {
     board[newApple[0]][newApple[1]].classList.add('apple');
 }
 
-function speedUp() {
-    clearInterval(intervalID);
-    if (intervalSpeed >= 60) {
-        intervalSpeed -= 3;
-    }
-    intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
-}
-
 function updateScore() {
     scoreHeader.textContent = `Score: ${score}`;
 }
@@ -170,12 +171,12 @@ function resetBoard() {
         tile.classList.remove('snake');
     });
     snake.splice(0, snake.length);
-    placeSnake();
     intervalID = null;
+    snakeSpeed = 100;
+    placeSnake();
     errorHeader.textContent = '';
     score = 0;
     updateScore();
-    intervalSpeed = 100;
 }
 
 function placeSnake() {
@@ -185,68 +186,71 @@ function placeSnake() {
     }
 }
 
+function addControlEventListeners() {
+    window.addEventListener('keydown', (e) => {
+        if (intervalID === null) {
+            intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+        }
+        switch (e.key) {
+            case 'ArrowDown':
+            case 's':
+                direction = changeDir('down', direction);
+                break;
+            case 'ArrowRight':
+            case 'd':
+                direction = changeDir('right', direction);
+                break;
+            case 'ArrowLeft':
+            case 'a':
+                direction = changeDir('left', direction);
+                break;
+            case 'ArrowUp':
+            case 'w':
+                direction = changeDir('up', direction);
+                break;
+        }
+    });
+    
+    const startGameButton = document.querySelector('#start-game');
+    startGameButton.addEventListener('click', () => {
+        if (intervalID === null) {
+            direction = 'right';
+            intervalID = setInterval(() => moveSnake(direction), snakeSpeed);
+        }
+    });
+    
+    const directionButtons = document.querySelectorAll('.dir-button');
+    directionButtons.forEach((b) => {
+        b.addEventListener('click', () => direction = changeDir(b.id, direction));
+    });
+    
+    const resetGameButton = document.querySelector('#reset');
+    resetGameButton.addEventListener('click', () => {
+        resetBoard();
+    });
+}
+
 /*function moveApple() {
     if apple[0] === undefined {
 
     }
 }*/
 
+// Initial variables required to run game
 const board = populateBoard(createBoard());
 const snake = [];
 let snakeGrew = false;
-const errorHeader = document.querySelector('.error-header');
 let direction = 'right';
-let intervalSpeed = 100;
-let intervalID = null;
 let score = 0;
+let snakeSpeed = 100;
+let intervalID = null;
+
+const errorHeader = document.querySelector('.error-header');
 const scoreHeader = document.querySelector('.score');
 
+// Add snake and apple to board
 placeSnake();
-
 let apple = generateApple();
 moveApple(null, apple);
 
-const directionButtons = document.querySelectorAll('.dir-button');
-directionButtons.forEach((b) => {
-    b.addEventListener('click', () => {
-        direction = changeDir(b.id, direction);
-        //if (direction) moveSnake(direction);
-    });
-});
-
-window.addEventListener('keydown', (e) => {
-    if (intervalID === null) {
-        intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
-    }
-    switch (e.key) {
-        case 'ArrowDown':
-        case 's':
-            direction = changeDir('down', direction);
-            break;
-        case 'ArrowRight':
-        case 'd':
-            direction = changeDir('right', direction);
-            break;
-        case 'ArrowLeft':
-        case 'a':
-            direction = changeDir('left', direction);
-            break;
-        case 'ArrowUp':
-        case 'w':
-            direction = changeDir('up', direction);
-            break;
-    }
-});
-
-const startGameButton = document.querySelector('#start-game');
-startGameButton.addEventListener('click', () => {
-    if (intervalID === null) {
-        direction = 'right';
-        intervalID = setInterval(() => moveSnake(direction), intervalSpeed);
-    }
-});
-
-const resetGameButton = document.querySelector('#reset');
-resetGameButton.addEventListener('click', () => {
-    resetBoard();
-});
+addControlEventListeners();
