@@ -164,12 +164,6 @@ function isOutOfBounds(x, y) {
     return false;
 }
 
-function displayError(e) {
-    const errorHeader = document.querySelector('.error-header');
-    errorHeader.textContent = e;
-    errorHeader.style.opacity = 100;
-}
-
 function generateApple() {
     let x, y;
     do {
@@ -194,7 +188,7 @@ function eatApple(x, y) {
         apple = moveApple(apple);
         speedUp();
         score += 1;
-        updateScore();
+        displayUpdatedScore();
         snakeGrew = true;
     }
 }
@@ -207,9 +201,15 @@ function speedUp() {
     intervalID = setInterval(() => moveSnake(), snakeSpeed);
 }
 
-function updateScore() {
+function displayUpdatedScore() {
     const scoreHeader = document.querySelector('.score');
     scoreHeader.textContent = `Score: ${score}`;
+}
+
+function displayError(e) {
+    const errorHeader = document.querySelector('.error-header');
+    errorHeader.textContent = e;
+    errorHeader.style.opacity = 100;
 }
 
 function resetBoard() {
@@ -225,8 +225,9 @@ function resetBoard() {
     const errorHeader = document.querySelector('.error-header');
     errorHeader.style.opacity = 0;
     score = 0;
-    updateScore();
+    displayUpdatedScore();
     apple = moveApple(apple);
+    direction = 'right';
 }
 
 /*function moveApple() {
@@ -236,14 +237,16 @@ function resetBoard() {
 }*/
 
 // Initial variables required to run game
+
+// This is the grid of tiles
 const board = populateBoard(createBoard());
+// This will store the coordinates of every 'snake' tile
 const snake = [];
 let snakeGrew = false;
 let direction = 'right';
 let score = 0;
 let snakeSpeed = 100;
 let intervalID = null;
-
 // Add snake and apple to board
 placeSnake();
 let apple = moveApple();
